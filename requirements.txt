@@ -1,0 +1,3 @@
+Flask-WTF==0.14.2
+PyMySQL==0.7.11
+WTForms-Components==0.10.3

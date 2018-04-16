@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<canvas id='chess' width='450px' height='450px'></canvas>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var chessarray = [];
+    var me = true
+    for (var i = 0; i < 15; i++) {
+        chessarray[i] = []
+        for (var j = 0 ; j < 15 ; j++) {
+            chessarray[i][j] = 0;
+        }
+    }
+    
+    var chess = document.getElementById('chess')
+    var context = chess.getContext('2d')
+    context.strokeStyle = '#a8a7a4'
+    var bg = new Image()
+    bg.src = "static/seal.png"
+    bg.onload = function() {
+        context.drawImage(bg, 0, 0, 450, 450)
+        drawChessBoard()
+    }
+
+    var drawChessBoard = function() {
+        for (var i = 0; i < 15 ; i++) {
+            context.moveTo(15 + i*30, 15)
+            context.lineTo(15 + i*30, 435)
+            context.stroke()
+            context.moveTo(15, 15 + i*30)
+            context.lineTo(435, 15 + i*30)
+            context.stroke()
+        }
+    }
+
+    var oneStep = function(i, j, me) {
+        context.beginPath()
+        context.arc(15 + i*30, 15 + j*30, 13, 0, 2*Math.PI)
+        context.closePath()
+        var gradient = context.createRadialGradient(15+i*30+2, 15+j*30-2, 13, 15+i*30+2, 15+j*30-2, 0)
+        if (me) {
+            gradient.addColorStop(0, "#0A0A0A")
+            gradient.addColorStop(1, "#0c091e")
+        } else {
+            gradient.addColorStop(0, "#0c091e")
+            gradient.addColorStop(1, "#9fe7f9")
+        }
+        context.fillStyle = gradient
+        context.fill()
+    }
+
+    chess.onclick = function(e) {
+        var x = e.offsetX
+        var y = e.offsetY
+        var i = Math.floor(x/30)
+        var j = Math.floor(y/30)
+        if (chessarray[i][j] === 0) {
+            oneStep(i, j, true)
+            chessarray[i][j] = 1;
+            $.ajax({
+                url:'/play',
+                data:{
+                    'x':i,
+                    'y':j
+                },
+                dataType:'JSON',
+                type:'POST',
+                success: function(data) {
+                    console.log(data)
+                    if (data.win == true) {
+                        alert('Agent Win!')
+                    }
+                    if (data.win == false) {
+                        alert('You Win??')
+                        return
+                    }
+                    oneStep(data.x, data.y, false)
+                    chessarray[data.x][data.y] = 2
+                }
+                });
+        }
+    }
+    
+</script>
+{% endblock %}

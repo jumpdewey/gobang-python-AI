@@ -1,0 +1,24 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        {% if title %}
+        <title>{{ title }} - Game</title>
+        {% else %}
+        <title>Welcome to Gobang Game!</title>
+        {% endif %}
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css')}}">
+        <!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <div>Gobang Game: <a href="/index">Home</a></div>
+        <hr>
+        {% block content %}
+        
+        {% endblock %}
+        
+        {% block scripts %}
+        
+        {% endblock %}
+    </body>
+</html>
