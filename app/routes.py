@@ -3,7 +3,7 @@ from app import app
 from action import Action
 from chessboard import Chessboard
 from app import _BLACK, _WHITE
-import time
+import time, math
 @app.route('/')
 @app.route('/index')
 def index():
@@ -22,38 +22,15 @@ def one_step():
     # bestmove, bestscore = cur.minimax(2)
     bestmove, bestscore = cur.alpha_beta(2)
     elapsed = time.clock()-start
-    data['elapsed-time'] = elapsed
+    data['elapsed-time'] = math.ceil(elapsed)
     if bestmove is None:
         data['win'] = False
         return data
-    data['best'] = str(bestmove)
+    data['best'] = str((bestmove.x, bestmove.y))
     bd = cur.board
 
-    # cands = cur.gen()
-    # data = {}
-    # maxval = 0
-    # bestaction = None
-    # bd = cur.board
-    # curval = cur.val
-    # for c in cands:
-    #     tmp = Action(c[0], c[1], False)
-    #     _ = cur.play(tmp)
-    #     if _ is None:
-    #         continue
-    #     val = _.val
-    #     data[str(c)] = val
-    #     if val > maxval:
-    #         bestaction = c
-    #         maxval = val
-
-    # if bestaction is None:
-    #     data['win'] = False
-    #     return data
-    # data['best'] = str(bestaction)
-
-
-    x = bestmove[0]
-    y = bestmove[1]
+    x = bestmove.x
+    y = bestmove.y
     data.update({'x':x, 'y':y})
     bd[x][y] = _WHITE
     cb = Chessboard(None, bd, bestscore)

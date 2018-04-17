@@ -13,21 +13,14 @@ class Chessboard:
                     for j in range(0, 15):
                         self.board[i][j] = bd[i][j]
         self.val = 0
-        self.Uvr = 0 if prev is None else prev.Uvr
-        self.Uvc = 0 if prev is None else prev.Uvc
-        self.Uvf = 0 if prev is None else prev.Uvf
-        self.Uvb = 0 if prev is None else prev.Uvb
-        self.Avr = 0 if prev is None else prev.Avr
-        self.Avc = 0 if prev is None else prev.Avc
-        self.Avf = 0 if prev is None else prev.Avf
-        self.Avb = 0 if prev is None else prev.Avb
+        self.Uv = 0 if prev is None else prev.Uv
+        self.Av = 0 if prev is None else prev.Av
         if givenbd != None:
             for i in range(0, 15):
                     for j in range(0, 15):
                         self.board[i][j] = givenbd[i][j]
         if givenVal != None:
             self.val = givenVal
-        
 
     def play(self, action):
         ''' return a new Chessboard'''
@@ -49,8 +42,10 @@ class Chessboard:
             rst.val = rst.evaluateAction(action)
         return rst
 
-    def gen(self):
-        tmp = []
+    def gen(self, black):
+        # generate potential actions
+
+        tmp = set()
         bd = self.board
         if bd is None:
             tmp.append((7,7))
@@ -59,12 +54,20 @@ class Chessboard:
             for i in range(0, 15):
                 for j in range(0, 15):
                     if bd[i][j] != 0:
-                        tmp.extend(self.getNextCandidates(i, j))
+                        for k in self.getNextCandidates(i, j):
+                            tmp.add(k)
         rsts = set(tmp)
         for r in tmp:
             for i in self.getNextCandidates(r[0], r[1]):
                 rsts.add(i)
-        return sorted(rsts, reverse=True)
+        actions = map(lambda ac: Action(ac[0], ac[1], black), rsts)
+        rsts = sorted(actions, key=self.evaluateAction,reverse=black)
+        # if len(rsts) <= 15:
+        #     return rsts
+        # else:
+        #     return rsts[0:15]
+        return rsts
+
     
     def getNextCandidates(self, x, y):
         def _checkEmpty(x, y):
@@ -134,11 +137,6 @@ class Chessboard:
                     rst += 4320
                 else:
                     rst += 600
-        tmpr = rst
-        if flag:
-            self.Uvr += tmpr
-        else:
-            self.Avr += tmpr
         
         # judge column
         if self.validation(x, y-1) == 0 and self.validation(x, y+1) == 0:
@@ -167,11 +165,6 @@ class Chessboard:
                     rst += 4320
                 else:
                     rst += 600
-        tmpc = rst - tmpr
-        if flag:
-            self.Uvc += tmpc
-        else:
-            self.Avc += tmpc
 
         # judge forward diagonal
         if self.validation(x+1, y-1) == 0 and self.validation(x-1, y+1) == 0:
@@ -200,12 +193,6 @@ class Chessboard:
                     rst += 4320
                 else:
                     rst += 600
-            
-        tmpf = rst - tmpc
-        if flag:
-            self.Uvf += tmpf
-        else:
-            self.Avf += tmpf
 
         #judge backward diagonal
         if self.validation(x-1, y-1) == 0 and self.validation(x+1, y+1) == 0:
@@ -234,12 +221,11 @@ class Chessboard:
                     rst += 4320
                 else:
                     rst += 600
-        tmpb = rst - tmpf
-        if flag:
-            self.Uvb += tmpb
-        else:
-            self.Avb += tmpb
 
+        if flag:
+            self.Uv += rst
+        else:
+            self.Av += rst
         # check win
         # if rst > 50000:
         #     Chessboard.isWin = False if action.black else True
@@ -248,20 +234,7 @@ class Chessboard:
 
 
     def evaluateBoard(self):
-        '''
-        return (UserVal, AgentVal) 
-        '''
-        UserVal = self.Uvb + self.Uvc + self.Uvf + self.Uvr
-        AgentVal = self.Avb + self.Avc + self.Avf + self.Avr
-        return AgentVal-UserVal
-    
-    # def evaluateBoardWithAction(self, ac):
-    #     x = ac.x
-    #     y = ac.y
-    #     black = ac.black
-    #     flag = _BLACK if black else _WHITE
-    #     if black == True:
-    #         # user's action, hence only increment self.U
+        return self.Av-self.Uv
 
     '''
         need to modify Chessboard.isWin
@@ -272,74 +245,60 @@ class Chessboard:
 
 
     def minimax(self, depth):
-        print 'minimax: ============='
-        cands = self.gen()
-        print 'minimax.gen(): =======', cands
+        cands = self.gen(False)
         if len(cands) == 0:
             return (None, None)
         best_move = None
         best_score = float('-inf')
         for c in cands:
-            tmp = Action(c[0], c[1], False)
-            newchessboard = self.play(tmp)
+            newchessboard = self.play(c)
             score = self.min_play(newchessboard, depth)
             if score > best_score:
                 best_move = c
                 best_score = score
                 # best score is the board's score
-        print '(best_move, best_score): ', best_move, best_score
         return (best_move, best_score)
 
     def max_play(self, state, depth):
         if self.isGameOver(depth):
-            print '*************max_play depth is 0*************'
             return state.evaluateBoard()
-        print 'max_play: ============='
-        cands = state.gen()
-        print 'max_play.gen(): =======', cands
+        cands = state.gen(False)
         best_score = float('-inf')
         if len(cands) == 0:
             return best_score
         for c in cands:
-            tmp = Action(c[0], c[1], False)
-            newchessboard = state.play(tmp)
+            newchessboard = state.play(c)
             score = state.min_play(newchessboard, depth)
             if score > best_score:
                 best_score = score
-        print 'max_play best_score:', best_score
         return best_score
 
 
     def min_play(self, state, depth):
         if self.isGameOver(depth):
             return state.evaluateBoard()
-        print 'min_play: ============='
-        cands = state.gen()
-        print 'min_play.gen(): =======', cands
+        cands = state.gen(True)
         best_score = float('inf')
         if len(cands) == 0:
             return best_score
         for c in cands:
-            tmp = Action(c[0], c[1], True)
-            newchessboard = state.play(tmp)
+            newchessboard = state.play(c)
             score = state.max_play(newchessboard, depth-1)
             if score < best_score:
                 best_score = score
-        print 'min_play best_score:', best_score
         return best_score
 
 # ================Alpha-beta pruning========================
 
     def alpha_beta(self, depth):
         beta = float('inf')
-        cands = self.gen()
+        cands = self.gen(False)
         if len(cands) == 0:
             return (None, None)
         best_move = None
         best_score = float('-inf')
         for c in cands:
-            tmp = Action(c[0], c[1], False)
-            newchessboard = self.play(tmp)
+            newchessboard = self.play(c)
             score = self.min_play2(newchessboard, depth, best_score, beta)
             if score > best_score:
                 best_move = c
@@ -351,14 +310,13 @@ class Chessboard:
     def max_play2(self, state, depth, alpha, beta):
         if self.isGameOver(depth):
             return state.evaluateBoard()
-        cands = state.gen()
+        cands = state.gen(False)
         best_score = float('-inf')
         if len(cands) == 0:
             return best_score
         for c in cands:
-            tmp = Action(c[0], c[1], False)
-            newchessboard = state.play(tmp)
-            score = state.min_play2(newchessboard, depth, alpha, beta)
+            newchessboard = state.play(c)
+            score = state.min_play2(newchessboard, depth-1, alpha, beta)
             best_score = max(best_score, score)
             if best_score >= beta:
                 return best_score
@@ -369,14 +327,13 @@ class Chessboard:
     def min_play2(self, state, depth, alpha, beta):
         if self.isGameOver(depth):
             return state.evaluateBoard()
-        cands = state.gen()
+        cands = state.gen(True)
         best_score = float('inf')
         if len(cands) == 0:
             return best_score
         for c in cands:
-            tmp = Action(c[0], c[1], True)
-            newchessboard = state.play(tmp)
-            score = state.max_play2(newchessboard, depth-1, alpha, beta)
+            newchessboard = state.play(c)
+            score = state.max_play2(newchessboard, depth, alpha, beta)
             best_score = min(best_score, score)
             if best_score <= alpha:
                 return best_score
