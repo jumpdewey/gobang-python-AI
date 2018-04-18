@@ -4,3 +4,16 @@ canvas {
     box-shadow: -2px -2px 2px #efef, 5px 5px 5px #b9b9;
     
 }
+
+button {
+    margin-top: 20px;
+    line-height: 60px;
+    font-weight: bold;
+    padding: 0 40px;
+    background: salmon;
+    border: none;
+  }
+  
+button:hover {
+    background: lightsalmon;
+  }

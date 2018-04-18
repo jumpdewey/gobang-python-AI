@@ -2,6 +2,8 @@
 
 {% block content %}
 <canvas id='chess' width='450px' height='450px'></canvas>
+<button id='button'>Start</button>
+<button id='restart'>Restart</button>
 {% endblock %}
 
 {% block scripts %}
@@ -13,6 +15,22 @@
         for (var j = 0 ; j < 15 ; j++) {
             chessarray[i][j] = 0;
         }
+    }
+    var button = document.getElementById('button');
+    button.onclick = function(e) {
+        $.ajax({
+            url:'/start',
+            type:'POST',
+            success:function(data){
+                alert('电脑接受挑战！并机智的选择了先手')
+                oneStep(7, 7, false);
+                chessarray[7][7] = 2;
+            }
+        })
+    }
+    var restart = document.getElementById('restart');
+    restart.onclick = function(e) {
+        location.reload()
     }
     
     var chess = document.getElementById('chess')

@@ -1,5 +1,8 @@
 from app import _BLACK, _WHITE
 from action import Action
+
+FIVE_POINT = 70000
+
 class Chessboard:
     isWin = None
     curB = None
@@ -21,7 +24,14 @@ class Chessboard:
                         self.board[i][j] = givenbd[i][j]
         if givenVal != None:
             self.val = givenVal
-        self.neighbours = set() if prev is None else prev.neighbours
+        if prev is None:
+            tmpset = set()
+            self.neighbours = set()
+            for i in self._genNeighbours(Action(7,7,False)):
+                tmpset.add(i)
+            self.neighbours = tmpset
+        else:
+            self.neighbours = prev.neighbours
 
     def play(self, action):
         ''' return a new Chessboard'''
@@ -142,7 +152,7 @@ class Chessboard:
                 else:
                     count = 0
             if m1 == 5:
-                rst += 50000
+                rst += FIVE_POINT
             elif m1 == 3:
                 rst += 600
             elif m1 == 4:
@@ -170,7 +180,7 @@ class Chessboard:
                 else:
                     count = 0
             if m1 == 5:
-                rst += 50000
+                rst += FIVE_POINT
             elif m1 == 3:
                 rst += 600
             elif m1 == 4:
@@ -198,7 +208,7 @@ class Chessboard:
                 else:
                     count = 0
             if m1 == 5:
-                rst += 50000
+                rst += FIVE_POINT
             elif m1 == 3:
                 rst += 600
             elif m1 == 4:
@@ -226,7 +236,7 @@ class Chessboard:
                 else:
                     count = 0
             if m1 == 5:
-                rst += 50000
+                rst += FIVE_POINT
             elif m1 == 3:
                 rst += 600
             elif m1 == 4:
@@ -240,8 +250,10 @@ class Chessboard:
         else:
             self.Av += rst
         # check win
-        # if rst > 50000:
-        #     Chessboard.isWin = False if action.black else True
+        if rst > FIVE_POINT:
+            Chessboard.isWin = False if action.black else True
+        elif rst < FIVE_POINT and Chessboard.isWin is not None:
+            Chessboard.isWin = None
 
         # Right Now! It's time to decrease opponent's point!
 
@@ -251,78 +263,78 @@ class Chessboard:
         if self.validation(x-1, y) == oppoflag and self.validation(x+1, y) == oppoflag:
             oppoval -= 720
             if (self.validation(x-2, y) == oppoflag and self.validation(x-3, y) == oppoflag) or (self.validation(x+2, y) == oppoflag and self.validation(x+3, y) == oppoflag):
-                oppoval -= 50000
+                oppoval -= FIVE_POINT
         elif self.validation(x-1, y) == oppoflag:
             if self.validation(x-2, y) == oppoflag and self.validation(x-3, y) == oppoflag:
                 if self.validation(x-4, y) == oppoflag and self.validation(x-5, y) == 0:
                     oppoval -= 3600
                 elif self.validation(x-4, y) == 0:
                     if self.validation(x-5, y) != oppoflag:
-                        oppoval -= 720
+                        oppoval -= 2720
         elif self.validation(x+1, y) == oppoflag:
             if self.validation(x+2, y) == oppoflag and self.validation(x+3, y) == oppoflag:
                 if self.validation(x+4, y) == oppoflag and self.validation(x+5, y) == 0:
                     oppoval -= 3600
                 elif self.validation(x+4, y) == 0:
                     if self.validation(x+5, y) != oppoflag:
-                        oppoval -= 720
+                        oppoval -= 2720
         # check column
         if self.validation(x, y-1) == oppoflag and self.validation(x, y+1) == oppoflag:
             oppoval -= 720
             if (self.validation(x, y-2) == oppoflag and self.validation(x, y-3) == oppoflag) or (self.validation(x, y+2) == oppoflag and self.validation(x, y+3) == oppoflag):
-                oppoval -= 50000
+                oppoval -= FIVE_POINT
         elif self.validation(x, y-1) == oppoflag:
             if self.validation(x, y-2) == oppoflag and self.validation(x, y-3) == oppoflag:
                 if self.validation(x, y-4) == oppoflag and self.validation(x, y-5) == 0:
                     oppoval -= 3600
                 elif self.validation(x, y-4) == 0:
                     if self.validation(x, y-5) != oppoflag:
-                        oppoval -= 720
+                        oppoval -= 2720
         elif self.validation(x, y+1) == oppoflag:
             if self.validation(x, y+2) == oppoflag and self.validation(x, y+3) == oppoflag:
                 if self.validation(x, y+4) == oppoflag and self.validation(x, y+5) == 0:
                     oppoval -= 3600
                 elif self.validation(x, y+4) == 0:
                     if self.validation(x, y+5) != oppoflag:
-                        oppoval -= 720
+                        oppoval -= 2720
         # check forward diagonal
         if self.validation(x-1, y+1) == oppoflag and self.validation(x+1, y-1) == oppoflag:
             oppoval -= 720
             if (self.validation(x-2, y+2) == oppoflag and self.validation(x-3, y+3) == oppoflag) or (self.validation(x+2, y+2) == oppoflag and self.validation(x+3, y+3) == oppoflag):
-                oppoval -= 50000
+                oppoval -= FIVE_POINT
         elif self.validation(x-1, y+1) == oppoflag:
             if self.validation(x-2, y+2) == oppoflag and self.validation(x-3, y+3) == oppoflag:
                 if self.validation(x-4, y+4) == oppoflag and self.validation(x-5, y+5) == 0:
                     oppoval -= 3600
                 elif self.validation(x-4, y+4) == 0:
                     if self.validation(x-5, y+5) != oppoflag:
-                        oppoval -= 720
+                        oppoval -= 2720
         elif self.validation(x+1, y-1) == oppoflag:
             if self.validation(x+2, y-2) == oppoflag and self.validation(x+3, y-3) == oppoflag:
                 if self.validation(x+4, y-4) == oppoflag and self.validation(x+5, y-5) == 0:
                     oppoval -= 3600
                 elif self.validation(x+4, y-4) == 0:
                     if self.validation(x+5, y-5) != oppoflag:
-                        oppoval -= 720
+                        oppoval -= 2720
         # check backward diagonal
         if self.validation(x-1, y-1) == oppoflag and self.validation(x+1, y+1) == oppoflag:
             oppoval -= 720
             if (self.validation(x-2, y-2) == oppoflag and self.validation(x-3, y-3) == oppoflag) or (self.validation(x+2, y+2) == oppoflag and self.validation(x+3, y+3) == oppoflag):
-                oppoval -= 50000
+                oppoval -= FIVE_POINT
         elif self.validation(x-1, y-1) == oppoflag:
             if self.validation(x-2, y-2) == oppoflag and self.validation(x-3, y-3) == oppoflag:
                 if self.validation(x-4, y-4) == oppoflag and self.validation(x-5, y-5) == 0:
                     oppoval -= 3600
                 elif self.validation(x-4, y-4) == 0:
                     if self.validation(x-5, y-5) != oppoflag:
-                        oppoval -= 720
+                        oppoval -= 2720
         elif self.validation(x+1, y+1) == oppoflag:
             if self.validation(x+2, y+2) == oppoflag and self.validation(x+3, y+3) == oppoflag:
                 if self.validation(x+4, y+4) == oppoflag and self.validation(x+5, y+5) == 0:
                     oppoval -= 3600
                 elif self.validation(x+4, y+4) == 0:
                     if self.validation(x+5, y+5) != oppoflag:
-                        oppoval -= 720
+                        oppoval -= 2720
 
         if action.black:
             self.Av = oppoval
@@ -340,9 +352,9 @@ class Chessboard:
         need to modify Chessboard.isWin
     '''    
     def isGameOver(self, depth):
-        return depth == 0
+        return depth == 0 or (Chessboard.isWin is not None)
 
-
+# ================Minimax========================
 
     def minimax(self, depth):
         cands = self.gen(False)

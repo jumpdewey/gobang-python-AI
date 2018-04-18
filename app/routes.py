@@ -10,6 +10,15 @@ def index():
     usr = {'username':'Dewey'}
     return render_template('index.html', title='Gobang', user=usr)
 
+@app.route('/start', methods=['POST'])
+def start():
+    bd = [[0 for i in range(0, 15)] for j in range(0, 15)]
+    Chessboard.curV = None
+    bd[7][7] = _WHITE
+    Chessboard.curB = bd
+    return jsonify(dict())
+
+
 @app.route('/play', methods=['POST'])
 def one_step():
     data = {}
