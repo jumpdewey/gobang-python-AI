@@ -7,8 +7,7 @@ import time, math
 @app.route('/')
 @app.route('/index')
 def index():
-    usr = {'username':'Dewey'}
-    return render_template('index.html', title='Gobang', user=usr)
+    return render_template('index.html', title='Gobang')
 
 @app.route('/start', methods=['POST'])
 def start():
@@ -16,6 +15,12 @@ def start():
     Chessboard.curV = None
     bd[7][7] = _WHITE
     Chessboard.curB = bd
+    return jsonify(dict())
+
+@app.route('/restart', methods=['POST'])
+def restart():
+    Chessboard.curB = [[0 for i in range(0, 15)] for j in range(0, 15)]
+    Chessboard.curV = None
     return jsonify(dict())
 
 
@@ -26,6 +31,9 @@ def one_step():
     y = int(request.form.get('y', 0))
     action = Action(x, y, True)
     cur = _usr_action(action)
+    if cur.checkWin(action) is True:
+        data['win'] = False
+        return jsonify(data)
     # calculate elapsed time
     start = time.clock()
     # bestmove, bestscore = cur.minimax(2)
@@ -34,10 +42,9 @@ def one_step():
     data['elapsed-time'] = math.ceil(elapsed)
     if bestmove is None:
         data['win'] = False
-        return data
+        return jsonify(data)
     data['best'] = str((bestmove.x, bestmove.y))
     bd = cur.board
-
     x = bestmove.x
     y = bestmove.y
     data.update({'x':x, 'y':y})
@@ -45,8 +52,12 @@ def one_step():
     cb = Chessboard(None, bd, bestscore)
     Chessboard.curB = bd
     Chessboard.curV = bestscore
-    data['win'] = Chessboard.isWin
-    _print_chessboard(bd)
+    if abs(bestscore) > 40000:
+        print 'abs(bestscore) > 40000'
+        print '(%s, %s)' % (x, y)
+        if cur.checkWin(bestmove) is True:
+            data['win'] = True
+    # _print_chessboard(bd)
     return jsonify(data)
 
 def _usr_action(action):

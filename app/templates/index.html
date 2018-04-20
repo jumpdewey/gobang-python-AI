@@ -31,6 +31,13 @@
     var restart = document.getElementById('restart');
     restart.onclick = function(e) {
         location.reload()
+        $.ajax({
+            url:'/restart',
+            type:'POST',
+            success:function(data) {
+                alert('Now click "Start" button to start the game!');
+            }
+        })
     }
     
     var chess = document.getElementById('chess')

@@ -4,7 +4,6 @@ from action import Action
 FIVE_POINT = 70000
 
 class Chessboard:
-    isWin = None
     curB = None
     curV = None
     def __init__(self, prev=None, givenbd=None, givenVal=None):
@@ -75,7 +74,8 @@ class Chessboard:
         #         rsts.add(i)
         rsts = self.neighbours
         actions = map(lambda ac: Action(ac[0], ac[1], black), rsts)
-        rsts = sorted(actions, key=self.evaluateAction,reverse=True)
+        # changing the value of 'reverse' to black makes it perform better.
+        rsts = sorted(actions, key=self.evaluateAction,reverse=black)
         if len(rsts) <=15:
             return rsts
         else:
@@ -119,7 +119,7 @@ class Chessboard:
     
     def validation(self, x, y):
         if x < 0 or x >= 15 or y < 0 or y >= 15:
-            return -1
+            return float('-inf')
         return self.board[x][y]
     
 
@@ -249,11 +249,6 @@ class Chessboard:
             self.Uv += rst
         else:
             self.Av += rst
-        # check win
-        if rst > FIVE_POINT:
-            Chessboard.isWin = False if action.black else True
-        elif rst < FIVE_POINT and Chessboard.isWin is not None:
-            Chessboard.isWin = None
 
         # Right Now! It's time to decrease opponent's point!
 
@@ -347,12 +342,9 @@ class Chessboard:
 
     def evaluateBoard(self):
         return self.Av-self.Uv
-
-    '''
-        need to modify Chessboard.isWin
-    '''    
-    def isGameOver(self, depth):
-        return depth == 0 or (Chessboard.isWin is not None)
+  
+    def isGameOver(self, depth, action):
+        return depth == 0 or self.checkWin(action)
 
 # ================Minimax========================
 
@@ -411,16 +403,18 @@ class Chessboard:
         best_score = float('-inf')
         for c in cands:
             newchessboard = self.play(c)
-            score = self.min_play2(newchessboard, depth, best_score, beta)
+            # try to pass parameter to min_play2()
+            score = self.min_play2(newchessboard, depth, best_score, beta, c)
             if score > best_score:
                 best_move = c
                 best_score = score
                 # best score is the board's score
-        print '(best_move, best_score): ', best_move, best_score
+        print '(best_move:(%s, %s), %s): ' % (best_move.x, best_move.y, best_score)
         return (best_move, best_score)
 
-    def max_play2(self, state, depth, alpha, beta):
-        if self.isGameOver(depth):
+    def max_play2(self, state, depth, alpha, beta, action):
+        # 'action' is the previous action leading to the current state
+        if self.isGameOver(depth, action):
             return state.evaluateBoard()
         cands = state.gen(False)
         best_score = float('-inf')
@@ -428,7 +422,7 @@ class Chessboard:
             return best_score
         for c in cands:
             newchessboard = state.play(c)
-            score = state.min_play2(newchessboard, depth-1, alpha, beta)
+            score = state.min_play2(newchessboard, depth-1, alpha, beta, c)
             best_score = max(best_score, score)
             if best_score > beta:
                 return best_score
@@ -436,8 +430,9 @@ class Chessboard:
         return best_score
 
 
-    def min_play2(self, state, depth, alpha, beta):
-        if self.isGameOver(depth):
+    def min_play2(self, state, depth, alpha, beta, action):
+        # 'action' is the previous action leading to the current state
+        if self.isGameOver(depth, action):
             return state.evaluateBoard()
         cands = state.gen(True)
         best_score = float('inf')
@@ -445,12 +440,65 @@ class Chessboard:
             return best_score
         for c in cands:
             newchessboard = state.play(c)
-            score = state.max_play2(newchessboard, depth, alpha, beta)
+            # try to pass action parameter to min_play2()
+            score = state.max_play2(newchessboard, depth, alpha, beta, c)
             best_score = min(best_score, score)
             if best_score < alpha:
                 return best_score
             beta = min(beta, best_score)
         return best_score
+    
+
+    def checkWin(self, action):
+        b = action.black
+        flag = _BLACK if action.black else _WHITE
+        x = action.x
+        y = action.y
+        count = 0
+        m1 = 0
+        # judge row
+        for i in range(-4, 5):
+            if self.validation(x+i, y) == flag:
+                count+=1
+                m1 = max(m1, count)
+            else:
+                count = 0
+        if m1 == 5:
+            return True
+        # judge column
+        count = 0
+        m1 = 0
+        for i in range(-4, 5):
+            if self.validation(x, y+i) == flag:
+                count+=1
+                m1 = max(m1, count)
+            else:
+                count = 0
+        if m1 == 5:
+            return True
+        # judge forward diagonal
+        count = 0
+        m1 = 0
+        for i in range(-4, 5):
+            if self.validation(x-i, y+i) == flag:
+                count+=1
+                m1 = max(m1, count)
+            else:
+                count = 0
+        if m1 == 5:
+            return True
+        # judge backward diagonal
+        count = 0
+        m1 = 0
+        for i in range(-4, 5):
+            if self.validation(x+i, y+i) == flag:
+                count+=1
+                m1 = max(m1, count)
+            else:
+                count = 0
+        if m1 == 5:
+            return True
+        return
 
         
 
