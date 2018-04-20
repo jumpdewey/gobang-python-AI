@@ -2,7 +2,8 @@ from app import _BLACK, _WHITE
 from action import Action
 
 FIVE_POINT = 70000
-
+FOUR_POINT = 10000
+THREE_POINT = 1000
 class Chessboard:
     curB = None
     curV = None
@@ -75,7 +76,8 @@ class Chessboard:
         rsts = self.neighbours
         actions = map(lambda ac: Action(ac[0], ac[1], black), rsts)
         # changing the value of 'reverse' to black makes it perform better.
-        rsts = sorted(actions, key=self.evaluateAction,reverse=black)
+        # Oops! the value of 'reverse' should be True!
+        rsts = sorted(actions, key=self.evaluateAction,reverse=True)
         if len(rsts) <=15:
             return rsts
         else:
@@ -154,12 +156,13 @@ class Chessboard:
             if m1 == 5:
                 rst += FIVE_POINT
             elif m1 == 3:
-                rst += 600
+                rst += THREE_POINT
             elif m1 == 4:
                 if self.validation(x+end1, y) == 0 and self.validation(x+end1-5, y) == 0:
-                    rst += 4320
+                    rst += FOUR_POINT
                 else:
-                    rst += 600
+                    rst += THREE_POINT
+                    rst += 2000
         
         # judge column
         if self.validation(x, y-1) == 0 and self.validation(x, y+1) == 0:
@@ -182,12 +185,13 @@ class Chessboard:
             if m1 == 5:
                 rst += FIVE_POINT
             elif m1 == 3:
-                rst += 600
+                rst += THREE_POINT
             elif m1 == 4:
                 if self.validation(x, y+end1) == 0 and self.validation(x, y+end1-5) == 0:
-                    rst += 4320
+                    rst += FOUR_POINT
                 else:
-                    rst += 600
+                    rst += THREE_POINT
+                    rst += 2000
 
         # judge forward diagonal
         if self.validation(x+1, y-1) == 0 and self.validation(x-1, y+1) == 0:
@@ -210,12 +214,13 @@ class Chessboard:
             if m1 == 5:
                 rst += FIVE_POINT
             elif m1 == 3:
-                rst += 600
+                rst += THREE_POINT
             elif m1 == 4:
                 if self.validation(x-end1, y+end1) == 0 and self.validation(x-end1+5, y+end1-5) == 0:
-                    rst += 4320
+                    rst += FOUR_POINT
                 else:
-                    rst += 600
+                    rst += THREE_POINT
+                    rst += 2000
 
         #judge backward diagonal
         if self.validation(x-1, y-1) == 0 and self.validation(x+1, y+1) == 0:
@@ -238,12 +243,13 @@ class Chessboard:
             if m1 == 5:
                 rst += FIVE_POINT
             elif m1 == 3:
-                rst += 600
+                rst += THREE_POINT
             elif m1 == 4:
                 if self.validation(x+end1, y+end1) == 0 and self.validation(x+end1-5, y+end1-5) == 0:
-                    rst += 4320
+                    rst += FOUR_POINT
                 else:
-                    rst += 600
+                    rst += THREE_POINT
+                    rst += 2000
 
         if action.black:
             self.Uv += rst
