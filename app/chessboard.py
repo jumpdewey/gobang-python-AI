@@ -58,21 +58,6 @@ class Chessboard:
     def gen(self, black):
         # generate potential actions
 
-        # tmp = set()
-        # bd = self.board
-        # if bd is None:
-        #     tmp.append((7,7))
-        #     return tmp
-        # if bd is not None:
-        #     for i in range(0, 15):
-        #         for j in range(0, 15):
-        #             if bd[i][j] != 0:
-        #                 for k in self.getNextCandidates(i, j):
-        #                     tmp.add(k)
-        # rsts = set(tmp)
-        # for r in tmp:
-        #     for i in self.getNextCandidates(r[0], r[1]):
-        #         rsts.add(i)
         rsts = self.neighbours
         actions = map(lambda ac: Action(ac[0], ac[1], black), rsts)
         # changing the value of 'reverse' to black makes it perform better.
@@ -278,25 +263,11 @@ class Chessboard:
             if self.validation(x-2, y) == oppoflag and self.validation(x-3, y) == oppoflag:
                 if self.validation(x-4, y) != flag:
                     oppoval -= FOUR_POINT
-                # if self.validation(x-4, y) == oppoflag and self.validation(x-5, y) == 0:
-                #     oppoval -= 0
-                # elif self.validation(x-4, y) == 0:
-                #     if self.validation(x-5, y) != oppoflag:
-                #         oppoval -= 2720
-                # elif self.validation(x-4, y) != flag:
-                #     oppoval -= FOUR_POINT
 
         elif self.validation(x+1, y) == oppoflag:
             if self.validation(x+2, y) == oppoflag and self.validation(x+3, y) == oppoflag:
                 if self.validation(x+4, y) != flag:
                     oppoval -= FOUR_POINT
-                # if self.validation(x+4, y) == oppoflag and self.validation(x+5, y) == 0:
-                #     oppoval -= 0
-                # elif self.validation(x+4, y) == 0:
-                #     if self.validation(x+5, y) != oppoflag:
-                #         oppoval -= 2720
-                # elif self.validation(x+4, y) != flag:
-                #     oppoval -= FOUR_POINT
         # check column
         if self.validation(x, y-1) == oppoflag and self.validation(x, y+1) == oppoflag:
             oppoval -= THREE_POINT
@@ -306,24 +277,10 @@ class Chessboard:
             if self.validation(x, y-2) == oppoflag and self.validation(x, y-3) == oppoflag:
                 if self.validation(x, y-4) != flag:
                     oppoval -= FOUR_POINT
-                # if self.validation(x, y-4) == oppoflag and self.validation(x, y-5) == 0:
-                #     oppoval -= 0
-                # elif self.validation(x, y-4) == 0:
-                #     if self.validation(x, y-5) != oppoflag:
-                #         oppoval -= 2720
-                # elif self.validation(x, y-4) != flag:
-                #     oppoval -= FOUR_POINT
         elif self.validation(x, y+1) == oppoflag:
             if self.validation(x, y+2) == oppoflag and self.validation(x, y+3) == oppoflag:
                 if self.validation(x, y+4) != flag:
                     oppoval -= FOUR_POINT
-                # if self.validation(x, y+4) == oppoflag and self.validation(x, y+5) == 0:
-                #     oppoval -= 0
-                # elif self.validation(x, y+4) == 0:
-                #     if self.validation(x, y+5) != oppoflag:
-                #         oppoval -= 2720
-                # elif self.validation(x, y+4) != flag:
-                #     oppoval -= FOUR_POINT
         # check forward diagonal
         if self.validation(x-1, y+1) == oppoflag and self.validation(x+1, y-1) == oppoflag:
             oppoval -= THREE_POINT
@@ -333,24 +290,10 @@ class Chessboard:
             if self.validation(x-2, y+2) == oppoflag and self.validation(x-3, y+3) == oppoflag:
                 if self.validation(x-4, y+4) != flag:
                     oppoval -= FOUR_POINT
-                # if self.validation(x-4, y+4) == oppoflag and self.validation(x-5, y+5) == 0:
-                #     oppoval -= 0
-                # elif self.validation(x-4, y+4) == 0:
-                #     if self.validation(x-5, y+5) != oppoflag:
-                #         oppoval -= 2720
-                # elif self.validation(x-4, y+4) != flag:
-                #     oppoval -= FOUR_POINT
         elif self.validation(x+1, y-1) == oppoflag:
             if self.validation(x+2, y-2) == oppoflag and self.validation(x+3, y-3) == oppoflag:
                 if self.validation(x+4, y-4) != flag:
                     oppoval -= FOUR_POINT
-                # if self.validation(x+4, y-4) == oppoflag and self.validation(x+5, y-5) == 0:
-                #     oppoval -= 0
-                # elif self.validation(x+4, y-4) == 0:
-                #     if self.validation(x+5, y-5) != oppoflag:
-                #         oppoval -= 2720
-                # elif self.validation(x+4, y-4) != flag:
-                #     oppoval -= FOUR_POINT
         # check backward diagonal
         if self.validation(x-1, y-1) == oppoflag and self.validation(x+1, y+1) == oppoflag:
             oppoval -= THREE_POINT
@@ -360,24 +303,10 @@ class Chessboard:
             if self.validation(x-2, y-2) == oppoflag and self.validation(x-3, y-3) == oppoflag:
                 if self.validation(x-4, y-4) != flag:
                     oppoval -= FOUR_POINT
-                # if self.validation(x-4, y-4) == oppoflag and self.validation(x-5, y-5) == 0:
-                #     oppoval -= 0
-                # elif self.validation(x-4, y-4) == 0:
-                #     if self.validation(x-5, y-5) != oppoflag:
-                #         oppoval -= 2720
-                # elif self.validation(x-4, y-4) != flag:
-                #     oppoval -= FOUR_POINT
         elif self.validation(x+1, y+1) == oppoflag:
             if self.validation(x+2, y+2) == oppoflag and self.validation(x+3, y+3) == oppoflag:
                 if self.validation(x+4, y+4) != flag:
                     oppoval -= FOUR_POINT
-                # if self.validation(x+4, y+4) == oppoflag and self.validation(x+5, y+5) == 0:
-                #     oppoval -= 0
-                # elif self.validation(x+4, y+4) == 0:
-                #     if self.validation(x+5, y+5) != oppoflag:
-                #         oppoval -= 2720
-                # elif self.validation(x+4, y+4) != flag:
-                #     oppoval -= FOUR_POINT
         if action.black:
             self.Av = oppoval
         else:

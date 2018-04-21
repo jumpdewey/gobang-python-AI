@@ -36,7 +36,6 @@ def one_step():
         return jsonify(data)
     # calculate elapsed time
     start = time.clock()
-    # bestmove, bestscore = cur.minimax(2)
     bestmove, bestscore = cur.alpha_beta(1)
     elapsed = time.clock()-start
     data['elapsed-time'] = math.ceil(elapsed)
