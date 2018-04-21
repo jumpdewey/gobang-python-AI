@@ -37,7 +37,7 @@ def one_step():
     # calculate elapsed time
     start = time.clock()
     # bestmove, bestscore = cur.minimax(2)
-    bestmove, bestscore = cur.alpha_beta(2)
+    bestmove, bestscore = cur.alpha_beta(1)
     elapsed = time.clock()-start
     data['elapsed-time'] = math.ceil(elapsed)
     if bestmove is None:
@@ -53,11 +53,9 @@ def one_step():
     Chessboard.curB = bd
     Chessboard.curV = bestscore
     if abs(bestscore) > 40000:
-        print 'abs(bestscore) > 40000'
-        print '(%s, %s)' % (x, y)
         if cur.checkWin(bestmove) is True:
             data['win'] = True
-    # _print_chessboard(bd)
+    _print_chessboard(bd)
     return jsonify(data)
 
 def _usr_action(action):
@@ -65,8 +63,8 @@ def _usr_action(action):
     return cb.play(action)
 
 def _print_chessboard(bd):
-    for i in range(0, 7):
+    for i in range(0, 15):
         print '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s' % (bd[0][i],bd[1][i],bd[2][i],bd[3][i],bd[4][i],bd[5][i],bd[6][i],bd[7][i],bd[8][i],bd[9][i],bd[10][i],bd[11][i],bd[12][i],bd[13][i], bd[14][i])
-        print '--------------------------------'
+        # print '--------------------------------'
 
     
