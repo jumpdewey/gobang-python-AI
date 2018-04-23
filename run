@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "Starting Gobang application..." &&
+export FLASK_APP = game.py && 
+flask run
