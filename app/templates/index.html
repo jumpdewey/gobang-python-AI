@@ -95,15 +95,15 @@
                 type:'POST',
                 success: function(data) {
                     console.log(data)
-                    if (data.win == true) {
-                        alert('Agent Win!')
-                    }
                     if (data.win == false) {
                         alert('You Win??')
                         return
                     }
                     oneStep(data.x, data.y, false)
                     chessarray[data.x][data.y] = 2
+                    if (data.win == true) {
+                        alert('Agent Win!')
+                    }
                 }
                 });
         }
